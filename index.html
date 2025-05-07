@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Milo’s Adventure</title>
+    <link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" />
+    <script defer src="https://pyscript.net/latest/pyscript.js"></script>
+    <style>
+        canvas {
+            display: block;
+            margin: auto;
+            border: 2px solid darkgreen;
+            background-image: url('m1.png');
+            background-size: cover;
+        }
+        button {
+            margin: 20px auto;
+            display: block;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            background: red;
+            color: white;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <button id="next-btn">Next ➜</button>
+    <py-script>
+from js import document
+from pyodide.ffi import create_proxy
+import random
+
+canvas = document.createElement("canvas")
+canvas.width = 800
+canvas.height = 600
+document.body.insertBefore(canvas, document.getElementById("next-btn"))
+ctx = canvas.getContext("2d")
+
+current_scene = 0
+
+def draw_scene_0():
+    ctx.clearRect(0, 0, 800, 600)
+    draw_monster(350, 400)
+    draw_text("Milo woke under a gentle, rosy tree...", 100, 80)
+
+def draw_scene_1():
+    ctx.clearRect(0, 0, 800, 600)
+    draw_monster(200, 400)
+    draw_text("He tip-toed by soft ferns and heard the birds sing…", 60, 80)
+    for _ in range(5):
+        draw_text("♪", random.randint(50, 750), random.randint(150, 250), size=24)
+
+def draw_scene_2():
+    ctx.clearRect(0, 0, 800, 600)
+    draw_monster(600, 400)
+    draw_text("Tiny fireflies danced above a calm stream…", 80, 80)
+    for _ in range(10):
+        x = random.randint(0, 800)
+        y = random.randint(100, 400)
+        ctx.beginPath()
+        ctx.arc(x, y, 4, 0, 2 * 3.14)
+        ctx.fillStyle = "yellow"
+        ctx.fill()
+
+def draw_scene_3():
+    ctx.clearRect(0, 0, 800, 600)
+    draw_monster(400, 400)
+    draw_text("At last, Milo found his cozy cave and felt safe…", 60, 80)
+    for _ in range(30):
+        x = random.randint(0, 800)
+        y = random.randint(100, 600)
+        radius = random.randint(4, 10)
+        ctx.beginPath()
+        ctx.arc(x, y, radius, 0, 2 * 3.14)
+        ctx.fillStyle = random.choice(["red","orange","yellow","green","blue","purple","pink"])
+        ctx.fill()
+
+def draw_scene_4():
+    ctx.clearRect(0, 0, 800, 600)
+    draw_text("Suddenly, forest friends appeared!", 100, 80)
+    for i in range(4):
+        x = 150 + i * 150
+        ctx.beginPath()
+        ctx.arc(x, 400, 30, 0, 2 * 3.14)
+        ctx.fillStyle = random.choice(["green", "blue", "orange"])
+        ctx.fill()
+        draw_text("• •", x - 15, 400, size=14)
+        draw_text("◡", x - 5, 415, size=12)
+
+def draw_scene_5():
+    ctx.clearRect(0, 0, 800, 600)
+    draw_text("Milo lives happily in the magical forest! 🌲🌟", 100, 80)
+    for x in range(100, 800, 100):
+        draw_tree(x, 400)
+    draw_text("The End! 🌈", 300, 550, size=24)
+
+def draw_monster(x, y):
+    img = document.createElement("img")
+    img.src = "monster.png"
+    img.onload = create_proxy(lambda e: ctx.drawImage(img, x, y, 80, 80))
+
+def draw_text(msg, x, y, size=20):
+    ctx.fillStyle = "black"
+    ctx.font = f"{size}px Comic Sans MS"
+    ctx.fillText(msg, x, y)
+
+def draw_tree(x, y):
+    ctx.fillStyle = "saddlebrown"
+    ctx.fillRect(x, y, 10, 40)
+    ctx.beginPath()
+    ctx.arc(x + 5, y, 30, 0, 2 * 3.14)
+    ctx.fillStyle = "forestgreen"
+    ctx.fill()
+
+scenes = [draw_scene_0, draw_scene_1, draw_scene_2, draw_scene_3, draw_scene_4, draw_scene_5]
+
+def next_scene(event=None):
+    global current_scene
+    if current_scene < len(scenes):
+        scenes[current_scene]()
+        current_scene += 1
+
+# Bind button
+next_btn = document.getElementById("next-btn")
+next_btn.addEventListener("click", create_proxy(next_scene))
+
+# Start with first scene
+next_scene()
+    </py-script>
+</body>
+</html>
